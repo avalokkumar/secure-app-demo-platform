@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      overflow: auto;
+      max-height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Authentication API Test</h1>
+  
+  <div class="card">
+    <h2>Login Test</h2>
+    <div class="form-group">
+      <label for="loginUsername">Username:</label>
+      <input type="text" id="loginUsername" value="admin">
+    </div>
+    <div class="form-group">
+      <label for="loginPassword">Password:</label>
+      <input type="password" id="loginPassword" value="admin123">
+    </div>
+    <button onclick="testLogin()">Test Login</button>
+    <h3>Response:</h3>
+    <pre id="loginResponse">Results will appear here...</pre>
+  </div>
+  
+  <div class="card">
+    <h2>Register Test</h2>
+    <div class="form-group">
+      <label for="regUsername">Username:</label>
+      <input type="text" id="regUsername" value="testuser2">
+    </div>
+    <div class="form-group">
+      <label for="regEmail">Email:</label>
+      <input type="email" id="regEmail" value="testuser2@sadp.com">
+    </div>
+    <div class="form-group">
+      <label for="regPassword">Password:</label>
+      <input type="password" id="regPassword" value="testuser123">
+    </div>
+    <div class="form-group">
+      <label for="regFirstName">First Name:</label>
+      <input type="text" id="regFirstName" value="Test">
+    </div>
+    <div class="form-group">
+      <label for="regLastName">Last Name:</label>
+      <input type="text" id="regLastName" value="User">
+    </div>
+    <button onclick="testRegister()">Test Register</button>
+    <h3>Response:</h3>
+    <pre id="registerResponse">Results will appear here...</pre>
+  </div>
+
+  <div class="card">
+    <h2>Refresh Token Test</h2>
+    <div class="form-group">
+      <label for="refreshToken">Refresh Token:</label>
+      <input type="text" id="refreshToken" placeholder="Paste refresh token here">
+    </div>
+    <button onclick="testRefreshToken()">Test Refresh</button>
+    <h3>Response:</h3>
+    <pre id="refreshResponse">Results will appear here...</pre>
+  </div>
+
+  <script>
+    // Test login API
+    async function testLogin() {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+      const responseElem = document.getElementById('loginResponse');
+      
+      responseElem.textContent = 'Sending request...';
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        responseElem.textContent = JSON.stringify(data, null, 2);
+        
+        // Store tokens if successful
+        if (response.ok) {
+          localStorage.setItem('accessToken', data.access_token);
+          localStorage.setItem('refreshToken', data.refresh_token);
+          document.getElementById('refreshToken').value = data.refresh_token;
+        }
+      } catch (error) {
+        responseElem.textContent = `Error: ${error.message}`;
+      }
+    }
+    
+    // Test register API
+    async function testRegister() {
+      const username = document.getElementById('regUsername').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      const firstName = document.getElementById('regFirstName').value;
+      const lastName = document.getElementById('regLastName').value;
+      const responseElem = document.getElementById('registerResponse');
+      
+      responseElem.textContent = 'Sending request...';
+      
+      try {
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+            username, 
+            email, 
+            password, 
+            first_name: firstName, 
+            last_name: lastName 
+          })
+        });
+        
+        const data = await response.json();
+        responseElem.textContent = JSON.stringify(data, null, 2);
+        
+        // Store tokens if successful
+        if (response.ok) {
+          localStorage.setItem('accessToken', data.access_token);
+          localStorage.setItem('refreshToken', data.refresh_token);
+          document.getElementById('refreshToken').value = data.refresh_token;
+        }
+      } catch (error) {
+        responseElem.textContent = `Error: ${error.message}`;
+      }
+    }
+    
+    // Test refresh token API
+    async function testRefreshToken() {
+      const refreshToken = document.getElementById('refreshToken').value;
+      const responseElem = document.getElementById('refreshResponse');
+      
+      if (!refreshToken) {
+        responseElem.textContent = 'Error: No refresh token provided';
+        return;
+      }
+      
+      responseElem.textContent = 'Sending request...';
+      
+      try {
+        const response = await fetch('/api/auth/refresh', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${refreshToken}`
+          }
+        });
+        
+        const data = await response.json();
+        responseElem.textContent = JSON.stringify(data, null, 2);
+        
+        // Update access token if successful
+        if (response.ok) {
+          localStorage.setItem('accessToken', data.access_token);
+        }
+      } catch (error) {
+        responseElem.textContent = `Error: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>

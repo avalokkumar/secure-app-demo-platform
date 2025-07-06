@@ -1,0 +1,106 @@
+/* Dashboard styles with dark mode compatibility */
+
+/* Security Skills Overview */
+.security-skills-card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.security-skills-card .card-header,
+.security-skills-card .card-footer {
+  border-color: var(--border-color);
+}
+
+.security-skills-card .card-header h5 {
+  color: var(--text-primary);
+}
+
+.skill-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.skill-progress-bar {
+  height: 8px;
+  border-radius: 4px;
+}
+
+/* Module Progress Cards */
+.module-progress-card {
+  transition: all 0.3s ease;
+  border-color: var(--border-color);
+}
+
+.module-progress-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .module-progress-card:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Dashboard statistics */
+.stat-card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.stat-card .stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  margin-right: 16px;
+}
+
+.stat-card .stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-card .stat-label {
+  color: var(--text-secondary);
+}
+
+.stat-card.modules-stat .stat-icon {
+  background-color: rgba(0, 128, 128, 0.1);
+  color: var(--primary-color);
+}
+
+.stat-card.lessons-stat .stat-icon {
+  background-color: rgba(25, 135, 84, 0.1);
+  color: var(--success-color);
+}
+
+.stat-card.exercises-stat .stat-icon {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: var(--accent-color);
+}
+
+.stat-card.completed-stat .stat-icon {
+  background-color: rgba(220, 53, 69, 0.1);
+  color: var(--danger-color);
+}
+
+/* Dark mode specific styles */
+[data-theme="dark"] .stat-card.modules-stat .stat-icon {
+  background-color: rgba(32, 178, 170, 0.2);
+}
+
+[data-theme="dark"] .stat-card.lessons-stat .stat-icon {
+  background-color: rgba(40, 167, 69, 0.2);
+}
+
+[data-theme="dark"] .stat-card.exercises-stat .stat-icon {
+  background-color: rgba(23, 162, 184, 0.2);
+}
+
+[data-theme="dark"] .stat-card.completed-stat .stat-icon {
+  background-color: rgba(220, 53, 69, 0.2);
+}

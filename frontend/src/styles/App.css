@@ -1,0 +1,110 @@
+/* App-specific styles */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-content {
+  flex: 1 0 auto;
+  padding: 2rem 0;
+}
+
+.app-footer {
+  flex-shrink: 0;
+}
+
+/* Navbar customizations */
+.navbar-brand {
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+/* Main content area */
+.main-content {
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+/* Custom card styles */
+.card {
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: none;
+}
+
+.card-header {
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Button customizations */
+.btn {
+  border-radius: 0.25rem;
+  padding: 0.5rem 1.25rem;
+}
+
+/* Code snippet highlighting */
+.code-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.code-language-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.25rem 0.75rem;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 0 0.5rem 0 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Exercise UI */
+.exercise-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+  .exercise-container {
+    flex-direction: column;
+  }
+}
+
+/* Badge styling */
+.badge {
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+}
+
+/* Alert customizations */
+.alert {
+  border-radius: 0.5rem;
+}
+
+/* Progress bar */
+.progress {
+  height: 0.6rem;
+  border-radius: 0.25rem;
+}
+
+/* Form customizations */
+.form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(2, 117, 216, 0.25);
+}
+
+/* Accessibility improvements */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

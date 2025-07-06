@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SADP API Documentation</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4.5.0/swagger-ui.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    .header {
+      background-color: #0d6efd;
+      color: white;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    .back-button {
+      background-color: white;
+      color: #0d6efd;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+    
+    .back-button:hover {
+      background-color: #f1f1f1;
+    }
+    
+    #swagger-ui {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>SADP API Documentation</h1>
+    <a href="/" class="back-button">← Back to Dashboard</a>
+  </div>
+  
+  <div id="swagger-ui"></div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@4.5.0/swagger-ui-bundle.js"></script>
+  
+  <script>
+    window.onload = function() {
+      // Pre-populated API specification to avoid CORS issues
+      const spec = {
+        "openapi": "3.0.0",
+        "info": {
+          "title": "Secure Application Demo Platform API",
+          "description": "API documentation for SADP backend services",
+          "version": "1.0.0"
+        },
+        "servers": [
+          {
+            "url": "http://localhost:5001/api",
+            "description": "Development server"
+          }
+        ],
+        "components": {
+          "securitySchemes": {
+            "BearerAuth": {
+              "type": "http",
+              "scheme": "bearer",
+              "bearerFormat": "JWT"
+            }
+          },
+          "schemas": {
+            "User": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "string", "format": "uuid"},
+                "username": {"type": "string"},
+                "email": {"type": "string", "format": "email"},
+                "first_name": {"type": "string"},
+                "last_name": {"type": "string"},
+                "role": {"type": "string"},
+                "is_active": {"type": "boolean"},
+                "created_at": {"type": "string", "format": "date-time"},
+                "last_login": {"type": "string", "format": "date-time", "nullable": true}
+              }
+            }
+          }
+        },
+        "paths": {
+          "/auth/login": {
+            "post": {
+              "summary": "User login",
+              "description": "Authenticate a user and return access and refresh tokens",
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "username": {"type": "string"},
+                        "password": {"type": "string", "format": "password"}
+                      },
+                      "required": ["username", "password"]
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "200": {
+                  "description": "Successful login",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "type": "object",
+                        "properties": {
+                          "message": {"type": "string"},
+                          "access_token": {"type": "string"},
+                          "refresh_token": {"type": "string"},
+                          "user": {"$ref": "#/components/schemas/User"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/auth/register": {
+            "post": {
+              "summary": "User registration",
+              "description": "Register a new user account",
+              "requestBody": {
+                "required": true,
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "username": {"type": "string"},
+                        "email": {"type": "string", "format": "email"},
+                        "password": {"type": "string", "format": "password"},
+                        "first_name": {"type": "string"},
+                        "last_name": {"type": "string"}
+                      },
+                      "required": ["username", "email", "password", "first_name", "last_name"]
+                    }
+                  }
+                }
+              },
+              "responses": {
+                "201": {
+                  "description": "Successful registration"
+                }
+              }
+            }
+          },
+          "/auth/refresh": {
+            "post": {
+              "summary": "Refresh access token",
+              "description": "Get a new access token using a valid refresh token",
+              "security": [{"BearerAuth": []}],
+              "responses": {
+                "200": {
+                  "description": "Successful token refresh"
+                }
+              }
+            }
+          },
+          "/auth/logout": {
+            "post": {
+              "summary": "User logout",
+              "description": "Invalidate the user session",
+              "security": [{"BearerAuth": []}],
+              "responses": {
+                "200": {
+                  "description": "Successful logout"
+                }
+              }
+            }
+          },
+          "/users/{user_id}": {
+            "get": {
+              "summary": "Get user details",
+              "description": "Retrieve details for a specific user",
+              "security": [{"BearerAuth": []}],
+              "parameters": [
+                {
+                  "name": "user_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {"type": "string", "format": "uuid"},
+                  "description": "UUID of the user"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "User details"
+                }
+              }
+            }
+          },
+          "/modules": {
+            "get": {
+              "summary": "List modules",
+              "description": "Retrieve a paginated list of modules",
+              "security": [{"BearerAuth": []}],
+              "parameters": [
+                {
+                  "name": "page",
+                  "in": "query",
+                  "schema": {"type": "integer", "default": 1},
+                  "description": "Page number"
+                },
+                {
+                  "name": "per_page",
+                  "in": "query",
+                  "schema": {"type": "integer", "default": 9},
+                  "description": "Items per page"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "List of modules"
+                }
+              }
+            }
+          },
+          "/modules/{module_id}": {
+            "get": {
+              "summary": "Get module details",
+              "description": "Retrieve details for a specific module",
+              "security": [{"BearerAuth": []}],
+              "parameters": [
+                {
+                  "name": "module_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {"type": "string", "format": "uuid"},
+                  "description": "UUID of the module"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Module details"
+                }
+              }
+            }
+          },
+          "/lessons/{lesson_id}": {
+            "get": {
+              "summary": "Get lesson details",
+              "description": "Retrieve details for a specific lesson",
+              "security": [{"BearerAuth": []}],
+              "parameters": [
+                {
+                  "name": "lesson_id",
+                  "in": "path",
+                  "required": true,
+                  "schema": {"type": "string", "format": "uuid"},
+                  "description": "UUID of the lesson"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "Lesson details"
+                }
+              }
+            }
+          }
+        }
+      };
+
+      window.ui = SwaggerUIBundle({
+        spec: spec,
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+        layout: "BaseLayout"
+      });
+    };
+  </script>
+</body>
+</html>

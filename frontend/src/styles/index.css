@@ -1,0 +1,128 @@
+/* Global styles */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+/* Color theme */
+:root {
+  --primary-color: #0275d8;
+  --secondary-color: #6c757d;
+  --success-color: #5cb85c;
+  --danger-color: #d9534f;
+  --warning-color: #f0ad4e;
+  --info-color: #5bc0de;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+}
+
+/* Lesson styles */
+.lesson-number-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: #e9ecef;
+  color: #495057;
+  font-weight: bold;
+}
+
+.lesson-completed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background-color: var(--success-color);
+  color: white;
+  font-weight: bold;
+}
+
+.lessons-list .list-group-item {
+  padding: 1rem;
+  border-left: none;
+  border-right: none;
+}
+
+.lessons-list .list-group-item:first-child {
+  border-top: none;
+}
+
+/* Module card styles */
+.module-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.module-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Auth pages */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f9fa;
+}
+
+/* Dashboard styles */
+.dashboard-stat-card {
+  border-left: 4px solid var(--primary-color);
+  border-radius: 4px;
+}
+
+.dashboard-stat-card.completed {
+  border-left-color: var(--success-color);
+}
+
+.dashboard-stat-card.in-progress {
+  border-left-color: var(--warning-color);
+}
+
+.dashboard-stat-card.not-started {
+  border-left-color: var(--secondary-color);
+}
+
+/* Code editor styles */
+.code-editor-container {
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+}
+
+.code-editor-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.code-editor-content {
+  padding: 1rem;
+  background-color: #fff;
+  min-height: 300px;
+}
+
+/* Loading spinner */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}

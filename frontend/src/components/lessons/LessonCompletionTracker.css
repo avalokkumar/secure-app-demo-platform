@@ -1,0 +1,37 @@
+.lesson-completion-tracker {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.progress-section {
+  margin-top: 10px;
+}
+
+.lesson-completion-tracker .progress {
+  height: 8px;
+}
+
+.lesson-completion-tracker .badge {
+  font-size: 0.8rem;
+  padding: 6px 10px;
+}
+
+/* Animation for completion */
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.lesson-completion-tracker .alert-success {
+  animation: celebrate 0.5s ease-in-out;
+}
+
+@media (max-width: 768px) {
+  .lesson-completion-tracker .btn {
+    margin-bottom: 10px;
+  }
+}

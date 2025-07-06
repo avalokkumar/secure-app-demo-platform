@@ -1,0 +1,194 @@
+import axios from 'axios';
+import { mockExercise, mockSubmissions, mockDelay, isBackendAvailable } from './mockData';
+
+// Create axios instance for API requests
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
+
+// Create axios instance with authorization header
+const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Add authorization header to requests when token is available
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Handle 401 responses (token expired)
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // If error is 401 and we haven't tried to refresh the token yet
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      try {
+        // Try to refresh the token
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (!refreshToken) {
+          // No refresh token available, redirect to login
+          window.location.href = '/login';
+          return Promise.reject(error);
+        }
+        
+        // Call the refresh token endpoint
+        const response = await axios.post(`${API_URL}/auth/refresh`, {}, {
+          headers: {
+            'Authorization': `Bearer ${refreshToken}`
+          }
+        });
+        
+        // Store the new token
+        localStorage.setItem('accessToken', response.data.access_token);
+        
+        // Retry the original request with the new token
+        originalRequest.headers['Authorization'] = `Bearer ${response.data.access_token}`;
+        return axios(originalRequest);
+      } catch (refreshError) {
+        // Refresh token failed, redirect to login
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(refreshError);
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+const ExerciseService = {
+  /**
+   * Get a specific exercise by ID
+   * 
+   * @param {string} exerciseId - Exercise ID
+   * @returns {Promise} Response with exercise data and user submissions
+   */
+  getExerciseById: async (exerciseId) => {
+    // Check if backend is available
+    if (await isBackendAvailable()) {
+      const response = await apiClient.get(`/exercises/${exerciseId}`);
+      return response.data;
+    } else {
+      // Use mock data when backend is unavailable
+      await mockDelay();  // Simulate network delay
+      
+      // Get mock exercise data
+      if (mockExercise.id !== exerciseId) {
+        throw { response: { status: 404, data: { message: 'Exercise not found' } } };
+      }
+      
+      // Get mock submissions for this exercise
+      const submissions = mockSubmissions[exerciseId] || [];
+      
+      return {
+        exercise: mockExercise,
+        submissions: submissions
+      };
+    }
+  },
+  
+  /**
+   * Submit a solution for an exercise
+   * 
+   * @param {string} exerciseId - Exercise ID
+   * @param {Object} data - Submission data (code)
+   * @returns {Promise} Response with submission result
+   */
+  submitExerciseSolution: async (exerciseId, data) => {
+    // Check if backend is available
+    if (await isBackendAvailable()) {
+      const response = await apiClient.post(`/exercises/${exerciseId}/submit`, data);
+      return response.data;
+    } else {
+      // Use mock data when backend is unavailable
+      await mockDelay(1500);  // Longer delay to simulate code execution
+      
+      // Check if this is the SQL injection exercise
+      if (exerciseId === mockExercise.id) {
+        // Simple check for parameterized query in the code
+        const isSuccessful = data.code.includes('?') && 
+                            (data.code.includes('cursor.execute(query, (') || 
+                             data.code.includes('cursor.execute(query, ['));
+        
+        // Create a new submission
+        const newSubmission = {
+          id: 'submission-' + Math.random().toString(36).substr(2, 9),
+          exercise_id: exerciseId,
+          submitted_code: data.code,
+          is_successful: isSuccessful,
+          feedback: isSuccessful ? 
+            'Great job! You correctly used parameterized queries to prevent SQL injection.' : 
+            'Your solution does not appear to use parameterized queries correctly. Try again!',
+          execution_time: (Math.random() * 0.5 + 0.2).toFixed(2),
+          created_at: new Date().toISOString()
+        };
+        
+        // Add this submission to mock data for future reference
+        if (!mockSubmissions[exerciseId]) {
+          mockSubmissions[exerciseId] = [];
+        }
+        mockSubmissions[exerciseId].unshift(newSubmission);
+        
+        return { submission: newSubmission };
+      } else {
+        throw { response: { status: 404, data: { message: 'Exercise not found' } } };
+      }
+    }
+  },
+  
+  /**
+   * Get all submissions for an exercise by the current user
+   * 
+   * @param {string} exerciseId - Exercise ID
+   * @returns {Promise} Response with submissions data
+   */
+  getExerciseSubmissions: async (exerciseId) => {
+    // Check if backend is available
+    if (await isBackendAvailable()) {
+      // First, get the current user's ID from localStorage
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.id;
+      
+      if (!userId) {
+        throw new Error('User ID not found. Please log in again.');
+      }
+      
+      // Fetch user progress which includes submission history
+      const response = await apiClient.get(`/progress/user/${userId}`);
+      
+      // Filter the progress data to find submissions for the specific exercise
+      const exerciseSubmissions = response.data.submissions?.filter(
+        submission => submission.exercise_id === exerciseId
+      ) || [];
+      
+      return { submissions: exerciseSubmissions };
+    } else {
+      // Use mock data when backend is unavailable
+      await mockDelay();  // Simulate network delay
+      
+      // Return mock submissions for this exercise
+      const submissions = mockSubmissions[exerciseId] || [];
+      return { submissions };
+    }
+  }
+};
+
+export default ExerciseService;
